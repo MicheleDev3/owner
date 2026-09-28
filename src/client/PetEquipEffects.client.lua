@@ -16,6 +16,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local PetConfig = require(Shared:WaitForChild("PetConfig"))
 local PetEffects = require(Shared:WaitForChild("PetEffects"))
+local PetAnimator = require(Shared:WaitForChild("PetAnimator"))
 local Effects = PetConfig.Effects
 
 local petsFolder = workspace:WaitForChild("PlayerPets")
@@ -52,6 +53,11 @@ local function onPetAdded(model)
 	end
 	if not model:FindFirstChildOfClass("Humanoid") then
 		PetEffects.popIn(model)
+		-- Humanoid pets play theirs on the server (PetWalkHandler).
+		local animator = PetAnimator.get(model)
+		if animator then
+			animator:playOnce("Equip")
+		end
 	end
 	PetEffects.poof(model:GetPivot().Position, effectColor(model), Effects.EquipSound, Effects.EquipSoundPitch)
 	watchUnequip(model)

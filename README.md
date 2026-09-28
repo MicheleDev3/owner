@@ -15,6 +15,7 @@ A Roblox pet system where pets and eggs **follow you and equip like in Adopt Me*
 | `src/shared/PetConfig.lua` | ModuleScript `ReplicatedStorage.Shared.PetConfig` |
 | `src/shared/PetModelBuilder.lua` | ModuleScript `ReplicatedStorage.Shared.PetModelBuilder` |
 | `src/shared/PetEffects.lua` | ModuleScript `ReplicatedStorage.Shared.PetEffects` |
+| `src/shared/PetAnimator.lua` | ModuleScript `ReplicatedStorage.Shared.PetAnimator` |
 | `src/server/PetServer.server.lua` | Script in `ServerScriptService` |
 | `src/client/PetFollow.client.lua` | LocalScript in `StarterPlayer.StarterPlayerScripts` |
 | `src/client/PetInventoryUI.client.lua` | LocalScript in `StarterPlayer.StarterPlayerScripts` |
@@ -29,6 +30,20 @@ A Roblox pet system where pets and eggs **follow you and equip like in Adopt Me*
 ## Using your own pet models
 
 Put a Model in `ReplicatedStorage.PetModels` with the same name as the item in `PetConfig.Items`, for example `Dog`. Its PrimaryPart's LookVector should point forward. Items without a custom model use a built-in placeholder.
+
+## Pet animations
+
+Rigged pets (Motor6D joints) can play real animations. Make them in Studio's Animation Editor, publish them, then add a Folder named `Animations` inside the pet model in `ReplicatedStorage.PetModels` with `Animation` objects named:
+
+| Name | When it plays |
+|---|---|
+| `Idle` | standing still (looped) |
+| `Walk` | following you (looped, speeds up/slows down with the pet) |
+| `Run` | catching up fast (looped, optional; uses `Walk` if missing) |
+| `Sit` | after standing still for 3 seconds (looped, optional; uses `Idle` if missing) |
+| `Equip` | once, when the pet pops in |
+
+Animations only play if they're owned by the game's owner (you, or your group for group games). Pets with an `Animations` folder skip the built-in bounce/tilt.
 
 ## Humanoid pets (walking NPC pets)
 

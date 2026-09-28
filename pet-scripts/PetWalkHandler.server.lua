@@ -55,6 +55,40 @@ sightParams.FilterDescendantsInstances = { pet }
 
 local stuckTimer = 0
 
+-- Optional animations: an "Animations" folder in the pet with Idle / Walk /
+-- Run / Sit / Equip Animation objects (see ReplicatedStorage.Shared.PetAnimator).
+-- Remove any default "Animate" script from the pet so the two don't fight.
+local RUN_SPEED = 20 -- above this play Run instead of Walk
+local WALK_ANIM_SPEED = 10 -- the speed the Walk animation was made for
+local RUN_ANIM_SPEED = 22 -- the speed the Run animation was made for
+local SIT_AFTER = 3 -- seconds standing still before sitting
+
+local shared = game:GetService("ReplicatedStorage"):FindFirstChild("Shared")
+local animatorModule = shared and shared:FindFirstChild("PetAnimator")
+local animator = animatorModule and require(animatorModule).get(pet)
+local idleTime = 0
+
+if animator then
+	animator:playOnce("Equip")
+end
+
+local function updateAnimation(dt)
+	if not animator then
+		return
+	end
+	local velocity = myRoot.AssemblyLinearVelocity
+	local speed = Vector3.new(velocity.X, 0, velocity.Z).Magnitude
+	if speed > 1 then
+		idleTime = 0
+		local running = speed > RUN_SPEED and animator:has("Run")
+		local baseSpeed = running and RUN_ANIM_SPEED or WALK_ANIM_SPEED
+		animator:setState(running and "Run" or "Walk", math.clamp(speed / baseSpeed, 0.5, 2))
+	else
+		idleTime += dt
+		animator:setState(idleTime > SIT_AFTER and "Sit" or "Idle")
+	end
+end
+
 local function getOwnerCharacter()
 	local owner = ownerId and Players:GetPlayerByUserId(ownerId)
 	local character = owner and owner.Character
@@ -206,4 +240,5 @@ connection = RunService.Heartbeat:Connect(function(dt)
 		return
 	end
 	update(dt)
+	updateAnimation(dt)
 end)

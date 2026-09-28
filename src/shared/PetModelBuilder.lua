@@ -159,9 +159,16 @@ end
 
 -- Uses a custom model from ReplicatedStorage.PetModels if one exists.
 local function buildCustom(model, template)
-	for _, child in template:GetChildren() do
-		child:Clone().Parent = model
+	local clone = template:Clone()
+	local rigRoot = clone.PrimaryPart
+	for _, child in clone:GetChildren() do
+		child.Parent = model
 	end
+	clone:Destroy()
+
+	-- A rigged pet (Motor6D joints) keeps its joints free so its animations
+	-- can play: only the rig's root part is anchored.
+	local rigged = model:FindFirstChildWhichIsA("Motor6D", true) ~= nil
 
 	local look = template.PrimaryPart and template.PrimaryPart.CFrame.LookVector or Vector3.new(0, 0, -1)
 	look = Vector3.new(look.X, 0, look.Z)
@@ -174,7 +181,7 @@ local function buildCustom(model, template)
 
 	for _, d in model:GetDescendants() do
 		if d:IsA("BasePart") then
-			d.Anchored = true
+			d.Anchored = not rigged or d == rigRoot or rigRoot == nil
 			d.CanCollide = false
 			d.CanTouch = false
 			d.CanQuery = false

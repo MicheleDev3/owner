@@ -17,7 +17,9 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
-local PetConfig = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("PetConfig"))
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local PetConfig = require(Shared:WaitForChild("PetConfig"))
+local PetAnimator = require(Shared:WaitForChild("PetAnimator"))
 local Follow = PetConfig.Follow
 
 local petsFolder = workspace:WaitForChild("PlayerPets")
@@ -142,7 +144,19 @@ local function updatePet(model, slot, root, humanoid, dt)
 
 	local bob, pitch, roll = 0, 0, 0
 	local hop = math.abs(math.sin(state.phase))
-	if isEgg then
+	local animator = PetAnimator.get(model)
+	if animator then
+		-- Real animations drive the pose; only move the pet around.
+		if state.sitBlend > 0.5 then
+			animator:setState("Sit")
+		elseif speed > 0.5 then
+			local running = speed > Follow.RunSpeed and animator:has("Run")
+			local baseSpeed = running and Follow.RunAnimSpeed or Follow.WalkAnimSpeed
+			animator:setState(running and "Run" or "Walk", math.clamp(speed / baseSpeed, 0.5, 2))
+		else
+			animator:setState("Idle")
+		end
+	elseif isEgg then
 		bob = hop * style.HopHeight * state.moveBlend
 		roll = math.sin(state.phase) * style.WaddleRoll * state.moveBlend
 			+ math.sin(state.clock * 2) * style.IdleWobble * (1 - state.moveBlend)

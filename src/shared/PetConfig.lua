@@ -75,6 +75,11 @@ PetConfig.Follow = {
 	TeleportDistance = 60, -- snap to the owner if further than this
 	TurnSpeed = 10, -- how fast the pet turns to face its direction
 
+	-- For pets with real animations (an "Animations" folder, see PetAnimator).
+	RunSpeed = 20, -- above this speed (studs/s) play Run instead of Walk
+	WalkAnimSpeed = 10, -- the speed the Walk animation was made for
+	RunAnimSpeed = 22, -- the speed the Run animation was made for
+
 	Pet = {
 		HopHeight = 0.35, -- small walking bounce
 		HopFrequency = 1.1, -- radians of bounce per stud walked
