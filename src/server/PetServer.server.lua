@@ -12,6 +12,7 @@ local HttpService = game:GetService("HttpService")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local PetConfig = require(Shared:WaitForChild("PetConfig"))
 local PetModelBuilder = require(Shared:WaitForChild("PetModelBuilder"))
+local PetEffects = require(Shared:WaitForChild("PetEffects"))
 
 local remotes = Instance.new("Folder")
 remotes.Name = "PetRemotes"
@@ -58,7 +59,15 @@ local function unequip(player, itemId)
 	end
 	for i, entry in list do
 		if entry.itemId == itemId then
-			entry.model:Destroy()
+			-- Let clients play the pop-out before the model is removed.
+			local model = entry.model
+			model:SetAttribute("Unequipping", true)
+			if model:FindFirstChildOfClass("Humanoid") then
+				PetEffects.popOut(model)
+			end
+			task.delay(PetConfig.Effects.PopOutTime + 0.05, function()
+				model:Destroy()
+			end)
 			table.remove(list, i)
 			local inventory = getInventory(player)
 			local item = inventory and inventory:FindFirstChild(itemId)
@@ -132,7 +141,14 @@ local function equip(player, itemId)
 		local bottom = box.Position.Y - size.Y / 2
 		model:PivotTo(model:GetPivot() + Vector3.new(0, spawnCFrame.Position.Y - bottom, 0))
 	end
+	-- Arrive on clients in one piece so the pop-in starts from the first frame.
+	model.ModelStreamingMode = Enum.ModelStreamingMode.Atomic
 	model.Parent = petsFolder
+	if model:FindFirstChildOfClass("Humanoid") then
+		-- Humanoid pets are physics driven by the server, so scale them here.
+		-- Anchored pets are scaled on each client (PetEquipEffects).
+		PetEffects.popIn(model)
+	end
 
 	table.insert(list, { itemId = itemId, model = model })
 	item:SetAttribute("Equipped", true)

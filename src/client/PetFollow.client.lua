@@ -69,6 +69,8 @@ local function getState(model)
 			yaw = yawFromVector(pivot.LookVector),
 			phase = 0,
 			moveBlend = 0,
+			idleTime = 0,
+			sitBlend = 0,
 			clock = math.random() * 10,
 		}
 		states[model] = state
@@ -129,6 +131,15 @@ local function updatePet(model, slot, root, humanoid, dt)
 	state.phase += speed * dt * style.HopFrequency
 	state.clock += dt
 
+	-- Pets sit down after standing around for a bit (eggs never sit).
+	if speed > 0.5 then
+		state.idleTime = 0
+	else
+		state.idleTime += dt
+	end
+	local sitting = (not isEgg and state.idleTime > style.SitAfter) and 1 or 0
+	state.sitBlend += (sitting - state.sitBlend) * math.min(1, dt * 6)
+
 	local bob, pitch, roll = 0, 0, 0
 	local hop = math.abs(math.sin(state.phase))
 	if isEgg then
@@ -137,8 +148,8 @@ local function updatePet(model, slot, root, humanoid, dt)
 			+ math.sin(state.clock * 2) * style.IdleWobble * (1 - state.moveBlend)
 	else
 		bob = hop * style.HopHeight * state.moveBlend
-			+ (math.sin(state.clock * 2.5) * 0.5 + 0.5) * style.IdleBob * (1 - state.moveBlend)
-		pitch = -math.sin(state.phase * 2) * style.WalkTilt * state.moveBlend
+			+ (math.sin(state.clock * 2.5) * 0.5 + 0.5) * style.IdleBob * (1 - state.moveBlend) * (1 - state.sitBlend)
+		pitch = -math.sin(state.phase * 2) * style.WalkTilt * state.moveBlend + style.SitPitch * state.sitBlend
 	end
 
 	model:PivotTo(

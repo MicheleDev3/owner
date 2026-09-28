@@ -80,6 +80,8 @@ PetConfig.Follow = {
 		HopFrequency = 1.1, -- radians of bounce per stud walked
 		WalkTilt = math.rad(4),
 		IdleBob = 0.04,
+		SitAfter = 3, -- seconds standing still before the pet sits down
+		SitPitch = math.rad(14), -- lean back onto its hind legs
 	},
 	Egg = {
 		HopHeight = 0.9, -- eggs hop along like in Adopt Me
@@ -90,5 +92,23 @@ PetConfig.Follow = {
 }
 
 PetConfig.EquipCooldown = 0.2
+
+-- Equip / unequip effect: the pet pops in with a bouncy grow, sparkles and a
+-- "bloop" sound, and pops out with a shrink and a puff when put away.
+PetConfig.Effects = {
+	PopInTime = 0.45, -- grow from nothing with a small overshoot
+	PopOutTime = 0.3, -- shrink away
+	-- Built-in Roblox sounds so it works out of the box. Swap in your own pop
+	-- sound, e.g. "rbxassetid://1234567890", for the closest Adopt Me feel.
+	EquipSound = "rbxasset://sounds/electronicpingshort.wav",
+	EquipSoundPitch = 1.6,
+	UnequipSound = "rbxasset://sounds/swoosh.wav",
+	UnequipSoundPitch = 1.4,
+	SoundVolume = 0.6,
+	SparkleTexture = "rbxasset://textures/particles/sparkles_main.dds",
+	SmokeTexture = "rbxasset://textures/particles/smoke_main.dds",
+	SparkleCount = 24,
+	SmokeCount = 10,
+}
 
 return PetConfig
