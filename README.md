@@ -1,0 +1,32 @@
+# Adopt Me style pets & eggs
+
+A Roblox pet system where pets and eggs **follow you and equip like in Adopt Me**:
+
+- **Backpack**: press the 🎒 button (or `B`) and click a pet or egg to equip it. Click it again to put it away. Equipping a different one swaps it (one out at a time, like Adopt Me; change `MaxEquipped` in `PetConfig`).
+- **Follow**: the pet walks to a spot behind you and to your right, stays on the ground (even when you jump), faces where it's walking, and turns to face your direction when you stop. If it falls too far behind, it teleports back to you.
+- **Animation**: pets trot with a small bounce. Eggs hop and waddle side to side.
+- Other players see everyone's pets. Each client animates all pets locally, so movement is smooth and costs the server nothing.
+
+## Files
+
+| File | Goes in Studio as |
+|---|---|
+| `src/shared/PetConfig.lua` | ModuleScript `ReplicatedStorage.Shared.PetConfig` |
+| `src/shared/PetModelBuilder.lua` | ModuleScript `ReplicatedStorage.Shared.PetModelBuilder` |
+| `src/server/PetServer.server.lua` | Script in `ServerScriptService` |
+| `src/client/PetFollow.client.lua` | LocalScript in `StarterPlayer.StarterPlayerScripts` |
+| `src/client/PetInventoryUI.client.lua` | LocalScript in `StarterPlayer.StarterPlayerScripts` |
+
+## Install
+
+**With Rojo:** run `rojo serve`, then connect from the Rojo plugin in Studio.
+
+**By hand:** in `ReplicatedStorage`, create a Folder named `Shared`. Then create each script from the table above and paste in its contents.
+
+## Using your own pet models
+
+Put a Model in `ReplicatedStorage.PetModels` with the same name as the item in `PetConfig.Items`, for example `Dog`. Its PrimaryPart's LookVector should point forward. Items without a custom model use a built-in placeholder.
+
+## Adding pets or eggs
+
+Add an entry to `PetConfig.Items` with `Kind = "Pet"` or `Kind = "Egg"`. Starter items are given in `PetServer.server.lua`; replace that with your DataStore loading.

@@ -1,0 +1,23 @@
+{
+  "name": "AdoptMePets",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "Shared": {
+        "$path": "src/shared"
+      }
+    },
+    "ServerScriptService": {
+      "PetServer": {
+        "$path": "src/server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "PetClient": {
+          "$path": "src/client"
+        }
+      }
+    }
+  }
+}
