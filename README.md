@@ -27,6 +27,10 @@ A Roblox pet system where pets and eggs **follow you and equip like in Adopt Me*
 
 Put a Model in `ReplicatedStorage.PetModels` with the same name as the item in `PetConfig.Items`, for example `Dog`. Its PrimaryPart's LookVector should point forward. Items without a custom model use a built-in placeholder.
 
+## Humanoid pets (walking NPC pets)
+
+If your pet model has a `Humanoid` and `HumanoidRootPart`, put a Script inside it with the contents of `pet-scripts/PetWalkHandler.server.lua` and store the model in `ReplicatedStorage.PetModels`. When it's equipped, the server clones it, names it after the owner's UserId, and the script walks it Adopt Me style. It uses the `PetPosition` / `PetWalkingPosition` / `PetBackStopPosition` / `PetBackPosition` / `PetProtector` parts on the character if they exist, otherwise built-in offsets.
+
 ## Adding pets or eggs
 
 Add an entry to `PetConfig.Items` with `Kind = "Pet"` or `Kind = "Egg"`. Starter items are given in `PetServer.server.lua`; replace that with your DataStore loading.

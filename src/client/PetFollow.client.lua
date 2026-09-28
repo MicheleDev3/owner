@@ -159,7 +159,8 @@ RunService.RenderStepped:Connect(function(dt)
 
 	local byOwner = {}
 	for _, model in petsFolder:GetChildren() do
-		if model:IsA("Model") and model.PrimaryPart then
+		-- Humanoid pets walk themselves (PetWalkHandler), so skip them here.
+		if model:IsA("Model") and model.PrimaryPart and not model:FindFirstChildOfClass("Humanoid") then
 			local ownerId = model:GetAttribute("OwnerUserId")
 			if ownerId then
 				byOwner[ownerId] = byOwner[ownerId] or {}

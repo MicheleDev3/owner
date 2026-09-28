@@ -107,12 +107,31 @@ local function equip(player, itemId)
 		unequip(player, list[1].itemId)
 	end
 
-	local model = PetModelBuilder.build(item.Value)
-	model.Name = player.Name .. "_" .. item.Value
+	local customFolder = ReplicatedStorage:FindFirstChild("PetModels")
+	local template = customFolder and customFolder:FindFirstChild(item.Value)
+	local model
+	if template and template:FindFirstChildOfClass("Humanoid") then
+		-- Humanoid pet: walks by itself with PetWalkHandler inside it.
+		-- Named after the owner's UserId, which older pet scripts expect.
+		model = template:Clone()
+		model.Name = tostring(player.UserId)
+		model:SetAttribute("ItemName", item.Value)
+		model:SetAttribute("Kind", PetConfig.Items[item.Value].Kind)
+	else
+		model = PetModelBuilder.build(item.Value)
+		model.Name = player.Name .. "_" .. item.Value
+	end
 	model:SetAttribute("OwnerUserId", player.UserId)
 	model:SetAttribute("ItemId", itemId)
 	model:SetAttribute("EquipOrder", os.clock())
-	model:PivotTo(spawnPosition(player))
+	local spawnCFrame = spawnPosition(player)
+	model:PivotTo(spawnCFrame)
+	if model:FindFirstChildOfClass("Humanoid") then
+		-- Lift so its feet (not its pivot) are on the ground.
+		local box, size = model:GetBoundingBox()
+		local bottom = box.Position.Y - size.Y / 2
+		model:PivotTo(model:GetPivot() + Vector3.new(0, spawnCFrame.Position.Y - bottom, 0))
+	end
 	model.Parent = petsFolder
 
 	table.insert(list, { itemId = itemId, model = model })
